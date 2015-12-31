@@ -6,6 +6,7 @@
 , sdlSupport ? true, SDL
 , vncSupport ? true, libjpeg, libpng
 , spiceSupport ? true, spice, spice_protocol, usbredir
+, rbdSupport ? true, ceph
 , x86Only ? false
 }:
 
@@ -34,7 +35,8 @@ stdenv.mkDerivation rec {
     ++ optionals sdlSupport [ SDL ]
     ++ optionals vncSupport [ libjpeg libpng ]
     ++ optionals spiceSupport [ spice_protocol spice usbredir ]
-    ++ optionals (hasSuffix "linux" stdenv.system) [ alsaLib libaio ];
+    ++ optionals (hasSuffix "linux" stdenv.system) [ alsaLib libaio ]
+    ++ optionals rbdSupport [ ceph ];
 
   enableParallelBuilding = true;
 
@@ -50,7 +52,8 @@ stdenv.mkDerivation rec {
     ]
     ++ optional spiceSupport "--enable-spice"
     ++ optional x86Only "--target-list=i386-softmmu,x86_64-softmmu"
-    ++ optional (hasSuffix "linux" stdenv.system) "--enable-linux-aio";
+    ++ optional (hasSuffix "linux" stdenv.system) "--enable-linux-aio"
+    ++ optional rbdSupport "--enable-rbd";
 
   postInstall =
     ''
